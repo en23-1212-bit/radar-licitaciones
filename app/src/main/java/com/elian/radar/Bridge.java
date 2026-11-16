@@ -83,6 +83,7 @@ public class Bridge {
             }
             o.put("debe", Text.monto(debe));
             o.put("viejas", viejas);
+            o.put("update", Store.obj(a, "update").optBoolean("nueva") ? Store.obj(a, "update").optString("name") : "");
             o.put("primeraVez", Store.obj(a, "health").optLong("lastOk", 0) == 0 && Store.obj(a, "procs").length() == 0);
             return o.toString();
         } catch (Exception e) {
@@ -367,6 +368,8 @@ public class Bridge {
             o.put("lastError", h.optString("lastError", ""));
             o.put("bytes", Store.bytes(a));
             o.put("version", nombreVersion());
+            o.put("update", Store.obj(a, "update"));
+            o.put("puedeInstalar", Updater.puedeInstalar(a));
             return o.toString();
         } catch (Exception e) {
             return err(e);
@@ -465,6 +468,29 @@ public class Bridge {
     }
 
     // ---------------- actualizaciones y copias ----------------
+
+    @JavascriptInterface
+    public void checkUpdate() {
+        new Thread(() -> {
+            String r;
+            try { Updater.revisar(a, false); r = "ok"; } catch (Exception e) { r = "error"; }
+            final String js = "window.onUpdateInfo && onUpdateInfo(" + JSONObject.quote(r) + ")";
+            a.runOnUiThread(() -> a.js(js));
+        }, "radar-update").start();
+    }
+
+    @JavascriptInterface
+    public String installUpdate() {
+        if (!Updater.puedeInstalar(a)) {
+            lanzar(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + a.getPackageName())));
+            return "permiso";
+        }
+        new Thread(() -> {
+            String e = Updater.instalar(a);
+            if (e != null) a.runOnUiThread(() -> a.js("toast(" + JSONObject.quote(e) + ")"));
+        }, "radar-instalar").start();
+        return "ok";
+    }
 
     @JavascriptInterface
     public void exportData() {

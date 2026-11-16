@@ -1,10 +1,10 @@
-# Radar de Licitaciones (uso interno, privado)
+# Radar de Licitaciones (uso interno)
 
 App Android que vigila las licitaciones de la DGCP y avisa con notificaciones del celular.
 
 ## Seguridad
-- Repositorio **privado**: el código y las versiones solo los ves tú.
-- La app se conecta **únicamente** a la API pública de datos abiertos de la DGCP. No usa servidor, GitHub ni WhatsApp.
+- La app se conecta solo a la API pública de la DGCP y a las versiones publicadas en este repositorio (solo lectura, sin claves). No usa servidor ni WhatsApp.
+- El repositorio debe seguir **público** para que la app vea las versiones nuevas. No contiene datos ni llaves.
 - La llave de firma está guardada cifrada en los secretos de este repositorio y se borra del equipo de GitHub al terminar cada construcción.
 - Nadie puede instalar una versión encima de la de tu papá sin esa llave.
 
@@ -14,9 +14,8 @@ App Android que vigila las licitaciones de la DGCP y avisa con notificaciones de
 - Si algo falla, se lo dice a tu papá en la app (Ajustes › Autovigilancia › Ver diagnóstico).
 
 ## Sacar una versión nueva
-1. Cualquier cambio en el código que llegue a `main` construye el APK firmado.
-2. Entra a **Releases** de este repositorio y descarga `radar.apk`.
-3. Mándaselo por WhatsApp; él lo abre y toca **Instalar**. Se pone encima y no pierde nada.
+1. Cualquier cambio en el código que llegue a `main` construye el APK firmado y lo publica en **Releases**.
+2. La app lo ve sola (al abrirla o en la revisión de la mañana) y muestra **Actualizar**. Un toque y listo; no pierde nada.
 
 ## Secretos (Settings › Secrets and variables › Actions)
 - `KEYSTORE_B64`: la llave de firma en base64.

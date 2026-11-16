@@ -3,6 +3,7 @@ package com.elian.radar;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -94,6 +95,11 @@ public class MainActivity extends Activity {
         if (System.currentTimeMillis() - lastOk > 9 * Const.H) {
             new Thread(() -> Engine.correr(getApplicationContext(), "al abrir"), "radar-abrir").start();
         }
+        // Buscar versión nueva al abrir (como máximo cada 6 horas)
+        new Thread(() -> {
+            Updater.revisarSiToca(getApplicationContext(), false);
+            runOnUiThread(() -> js("window.onUpdateInfo && onUpdateInfo()"));
+        }, "radar-version").start();
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIF);
         }
@@ -102,8 +108,28 @@ public class MainActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        if (Updater.ACCION_INSTALAR.equals(intent.getAction())) {
+            int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -999);
+            if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+                Intent confirmar = Build.VERSION.SDK_INT >= 33
+                        ? intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent.class)
+                        : legacyIntent(intent);
+                if (confirmar != null) {
+                    confirmar.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(confirmar);
+                }
+            } else if (status != PackageInstaller.STATUS_SUCCESS && status != -999) {
+                js("window.toast && toast(" + JSONObject.quote("No se instaló la actualización. Intenta de nuevo.") + ")");
+            }
+            return;
+        }
         String pantalla = intent.getStringExtra("pantalla");
         if (pantalla != null) js("window.go && go(" + JSONObject.quote(pantalla) + ")");
+    }
+
+    @SuppressWarnings("deprecation")
+    private static Intent legacyIntent(Intent i) {
+        return i.getParcelableExtra(Intent.EXTRA_INTENT);
     }
 
     @Override

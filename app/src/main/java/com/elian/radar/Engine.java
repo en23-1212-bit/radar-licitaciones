@@ -177,6 +177,7 @@ public final class Engine {
                 resultados(c, procs, s);
                 avisarCambios(c);
                 try { Precios.actualizar(c, s, ahora); } catch (Exception ignored) {}
+                try { Updater.revisar(c, true); } catch (Exception ignored) {}
             } else if (!silencio) {
                 avisarCambios(c);
             }

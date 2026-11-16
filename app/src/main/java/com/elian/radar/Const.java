@@ -6,8 +6,12 @@ import java.util.TimeZone;
 public final class Const {
     private Const() {}
 
-    /** Único sitio al que se conecta la app: la API pública de datos abiertos de la DGCP. */
+    /** La app solo se conecta a dos sitios: la API pública de la DGCP y las versiones publicadas en GitHub. */
     public static final String API_DEFAULT = "https://datosabiertos.dgcp.gob.do/api-dgcp/v1";
+    public static final String REPO = "en23-1212-bit/radar-licitaciones";
+    public static final String RELEASES = "https://api.github.com/repos/" + REPO + "/releases/latest";
+    /** Solo se aceptan descargas de actualizaciones desde aquí. */
+    public static final String DESCARGAS = "https://github.com/" + REPO + "/releases/download/";
     public static final String PORTAL = "https://comunidad.comprasdominicana.gob.do/Public/Tendering/ContractNoticeManagement/Index";
 
     public static final TimeZone TZ = TimeZone.getTimeZone("America/Santo_Domingo");

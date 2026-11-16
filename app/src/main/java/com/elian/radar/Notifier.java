@@ -19,6 +19,7 @@ public final class Notifier {
 
     public static final int ID_RESUMEN = 100;
     public static final int ID_VIGILANCIA = 900;
+    public static final int ID_ACTUALIZACION = 901;
 
     public static void canales(Context c) {
         NotificationManager nm = c.getSystemService(NotificationManager.class);

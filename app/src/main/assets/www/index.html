@@ -365,6 +365,7 @@ function rInicio(){
       '<button class="btn big full" style="margin-top:12px" onclick="revisar()">Revisar ahora</button></div>';
     $("inicio-c").innerHTML = html; return;
   }
+  if (d.update) html += '<div class="card row" style="margin-top:10px;border-color:#bfe5cb;background:var(--okbg)"><div><b>Hay una versión nueva</b><div class="small mute">' + esc(d.update) + '</div></div><button class="btn ok" onclick="actualizar()">Actualizar</button></div>';
   html += '<div class="grid kpis3" style="margin-top:12px">' +
     '<div class="card kpi" onclick="verLista(\'nuevas\')"><b style="color:var(--acc)">' + (d.nNuevas || 0) + '</b><span>Nuevas</span></div>' +
     '<div class="card kpi" onclick="verLista(\'pronto\')"><b style="color:var(--warn)">' + (d.nPronto || 0) + '</b><span>Cierran pronto</span></div>' +
@@ -484,7 +485,7 @@ function rAjustes(){
   loadS(); var n = 0; for (var k in S.on) if (S.on[k]) n++;
   $("sum-vendo").textContent = n + " categorías marcadas";
   var h = J(A.health()); $("sum-vigila").innerHTML = '<span style="color:' + (h.nivel === "ok" ? "var(--ok)" : h.nivel === "bad" ? "var(--acc)" : "var(--warn)") + '">● ' + esc(h.msg) + '</span>';
-  $("sum-version").textContent = "Versión " + (h.version || "");
+  $("sum-version").textContent = "Versión " + (h.version || "") + ((h.update || {}).nueva ? " · hay una nueva" : "");
 }
 function rVendo(){
   loadS(); var q = norm($("cat-q").value || ""), html = "";
@@ -574,14 +575,21 @@ function diagnostico(){
 }
 
 function rCopia(){
-  var h = J(A.health());
-  $("copia-c").innerHTML = '<div class="card"><div class="chk"><span>Versión instalada</span><b>' + esc(h.version) + '</b></div>' +
-    '<div class="chk"><span>Copia automática</span><span class="chip c-ok">En su cuenta de Google</span></div></div>' +
-    '<h2>Cómo se actualiza</h2><div class="card small">Cuando haya una versión nueva, Eli te la manda por WhatsApp. Ábrela y toca <b>Instalar</b>: se pone encima de esta y no se pierde nada (ajustes, ofertas ni facturas).</div>' +
-    '<button class="btn alt full" style="margin-top:12px" onclick="A.exportData()">Exportar copia (ajustes, ofertas y facturas)</button>' +
+  var h = J(A.health()), u = h.update || {};
+  var html = '<div class="card"><div class="chk"><span>Versión instalada</span><b>' + esc(h.version) + '</b></div>' +
+    '<div class="chk"><span>Copia automática</span><span class="chip c-ok">En su cuenta de Google</span></div></div>';
+  if (u.nueva) html += '<div class="card" style="margin-top:10px;border-color:#bfe5cb"><b>Hay una versión nueva: ' + esc(u.name) + '</b>' +
+    '<button class="btn ok big full" style="margin-top:10px" onclick="actualizar()">Actualizar</button>' +
+    (!h.puedeInstalar ? '<div class="small mute" style="margin-top:6px">La primera vez Android pide permitir “instalar apps de esta fuente”. Actívalo y vuelve a tocar Actualizar.</div>' : '') + '</div>';
+  else html += '<div class="note" style="margin-top:10px">Estás al día. La app busca versiones nuevas sola y te avisa.</div>';
+  html += '<button class="btn alt full" style="margin-top:10px" onclick="A.checkUpdate();toast(\'Buscando…\')">Buscar actualización</button>' +
+    '<button class="btn alt full" style="margin-top:8px" onclick="A.exportData()">Exportar copia (ajustes, ofertas y facturas)</button>' +
     '<button class="btn alt full" style="margin-top:8px" onclick="A.importData()">Restaurar una copia</button>' +
-    '<p class="note" style="margin-top:12px">Si cambia de celular y entra con su misma cuenta de Google, Android restaura la app con sus datos. La copia exportada es por si acaso.</p>';
+    '<p class="note" style="margin-top:12px">Al actualizar no se pierde nada. Si cambia de celular y entra con su misma cuenta de Google, Android restaura la app con sus datos.</p>';
+  $("copia-c").innerHTML = html;
 }
+function onUpdateInfo(r){ if (r === "error") toast("No pude revisar. ¿Hay internet?"); else if (r === "ok") { var u = (J(A.health()).update || {}); toast(u.nueva ? "Hay una versión nueva" : "Estás al día"); } if (CUR === "inicio" || CUR === "a-copia" || CUR === "ajustes") render(); }
+function actualizar(){ var r = A.installUpdate(); toast(r === "permiso" ? "Permite instalar desde Radar y vuelve a tocar Actualizar" : "Descargando… Android te pedirá confirmar"); }
 
 // ---------- inicio ----------
 var h0 = (location.hash || "").replace("#", "");
