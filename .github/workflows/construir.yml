@@ -1,0 +1,51 @@
+name: Construir la app
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+
+      - name: Preparar llave de firma
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then echo "Falta el secreto KEYSTORE_B64"; exit 1; fi
+          echo "$KEYSTORE_B64" | base64 -d > app/radar.jks
+
+      - name: Construir APK
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: gradle :app:assembleRelease --no-daemon --stacktrace
+
+      - name: Borrar la llave
+        if: always()
+        run: rm -f app/radar.jks
+
+      - name: Guardar la version en Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk radar.apk
+          gh release create "v${{ github.run_number }}" radar.apk \
+            --title "Version 1.0.${{ github.run_number }}" \
+            --notes "Descarga radar.apk y mandaselo a tu papa por WhatsApp."
