@@ -1,0 +1,6 @@
+{
+  "pausa": false,
+  "mensaje": "",
+  "apiBase": "https://datosabiertos.dgcp.gob.do/api-dgcp/v1",
+  "reporteWhatsApp": ""
+}
