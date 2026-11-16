@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "grupos": [
+    {"g": "Alimentos", "items": [
+      {"id": "res", "n": "Carne de res", "code": "50110000", "on": true, "w": ["carne de res", "res molida", "bistec", "costilla de res", "masa de res", "hígado de res", "carne molida"]},
+      {"id": "cerdo", "n": "Cerdo", "code": "50110000", "on": true, "w": ["cerdo", "chuleta", "pernil", "costilla de cerdo", "masa de cerdo", "tocino"]},
+      {"id": "pollo", "n": "Pollo y pavo", "code": "50110000", "on": true, "w": ["pollo", "pechuga", "muslo", "alitas", "pavo"]},
+      {"id": "embutidos", "n": "Embutidos", "code": "50110000", "on": true, "w": ["embutidos", "salami", "salchicha", "jamón", "jamonilla", "mortadela", "longaniza", "chorizo", "tocineta"]},
+      {"id": "carnes", "n": "Carnes en general", "code": "50110000", "on": true, "w": ["carnes", "cárnicos", "productos cárnicos", "proteínas", "proteína animal"]},
+      {"id": "lacteos", "n": "Leche y quesos", "code": "50130000", "on": true, "w": ["queso", "queso de freír", "queso amarillo", "leche", "leche en polvo", "mantequilla", "yogur"]},
+      {"id": "huevos", "n": "Huevos", "code": "50130000", "on": false, "w": ["huevos", "cartón de huevos"]},
+      {"id": "pescado", "n": "Pescados y mariscos", "code": "50120000", "on": false, "w": ["pescado", "atún", "sardinas", "bacalao", "arenque", "camarones"]},
+      {"id": "granos", "n": "Arroz, habichuelas y granos", "code": "50220000", "on": false, "w": ["arroz", "habichuelas", "gandules", "lentejas", "maíz", "avena"]},
+      {"id": "pastas", "n": "Pastas y harinas", "code": "50220000", "on": false, "w": ["pasta alimenticia", "espaguetis", "coditos", "harina"]},
+      {"id": "viveres", "n": "Víveres y vegetales", "code": "50400000", "on": false, "w": ["víveres", "plátano", "yuca", "papa", "batata", "ñame", "cebolla", "ajo", "ají", "tomate", "vegetales"]},
+      {"id": "frutas", "n": "Frutas", "code": "50300000", "on": false, "w": ["frutas", "guineo", "naranja", "piña", "lechosa", "limón"]},
+      {"id": "aceites", "n": "Aceites y grasas", "code": "50150000", "on": false, "w": ["aceite vegetal", "aceite de soya", "aceite de cocina", "manteca"]},
+      {"id": "azucar", "n": "Azúcar, dulces y galletas", "code": "50160000", "on": false, "w": ["azúcar", "dulces", "chocolate", "galletas"]},
+      {"id": "sazones", "n": "Sazones y condimentos", "code": "50170000", "on": false, "w": ["sal yodada", "sazón", "salsa de tomate", "pasta de tomate", "vinagre", "orégano", "cubitos"]},
+      {"id": "pan", "n": "Pan y repostería", "code": "50180000", "on": false, "w": ["pan", "pan de agua", "bizcocho", "repostería"]},
+      {"id": "enlatados", "n": "Enlatados y comida preparada", "code": "50190000", "on": false, "w": ["enlatados", "conservas", "sopas", "comida preparada"]},
+      {"id": "bebidas", "n": "Bebidas, jugos y café", "code": "50200000", "on": false, "w": ["jugos", "refrescos", "café", "bebidas"]},
+      {"id": "agua", "n": "Agua", "code": "50200000", "on": false, "w": ["agua purificada", "botellones de agua", "agua embotellada"]}
+    ]},
+    {"g": "Servicios de comida", "items": [
+      {"id": "catering", "n": "Raciones cocidas y catering", "code": "90100000", "on": false, "w": ["raciones cocidas", "catering", "almuerzos", "servicio de alimentación", "buffet", "picaderas"]}
+    ]},
+    {"g": "Transporte", "items": [
+      {"id": "transporte", "n": "Transporte y fletes", "code": "78100000", "on": false, "w": ["transporte de carga", "transporte de mercancías", "fletes", "acarreo", "mudanza"]},
+      {"id": "almacen", "n": "Almacenamiento", "code": "78130000", "on": false, "w": ["almacenamiento", "cuarto frío", "refrigerado"]}
+    ]},
+    {"g": "Hogar, limpieza y oficina", "items": [
+      {"id": "limpieza", "n": "Limpieza e higiene", "code": "47000000", "on": false, "w": ["materiales de limpieza", "detergente", "cloro", "desinfectante", "papel higiénico", "jabón"]},
+      {"id": "desechables", "n": "Desechables y cocina", "code": "52000000", "on": false, "w": ["desechables", "platos desechables", "vasos desechables", "cubiertos", "foam", "utensilios de cocina"]},
+      {"id": "electro", "n": "Electrodomésticos", "code": "52000000", "on": false, "w": ["nevera", "estufa", "microondas", "freezer", "abanicos"]},
+      {"id": "oficina", "n": "Papelería y oficina", "code": "44000000", "on": false, "w": ["papelería", "resmas", "papel bond", "tóner", "bolígrafos", "folders"]},
+      {"id": "muebles", "n": "Muebles", "code": "56000000", "on": false, "w": ["muebles", "sillas", "escritorios", "literas", "colchones"]},
+      {"id": "tecnologia", "n": "Computadoras y tecnología", "code": "43000000", "on": false, "w": ["computadoras", "laptops", "impresoras", "servidores", "software"]}
+    ]},
+    {"g": "Ropa y personal", "items": [
+      {"id": "uniformes", "n": "Uniformes, ropa y calzado", "code": "53000000", "on": false, "w": ["uniformes", "botas", "calzado", "camisetas", "gorras"]},
+      {"id": "aseo", "n": "Artículos de aseo personal", "code": "53000000", "on": false, "w": ["kits de higiene", "pasta dental", "cepillos dentales", "desodorante"]}
+    ]},
+    {"g": "Salud", "items": [
+      {"id": "medicamentos", "n": "Medicamentos", "code": "51000000", "on": false, "w": ["medicamentos", "fármacos", "antibióticos", "analgésicos"]},
+      {"id": "medico", "n": "Material médico y odontológico", "code": "42000000", "on": false, "w": ["material médico", "gasas", "jeringuillas", "guantes de látex", "insumos odontológicos", "material gastable"]}
+    ]},
+    {"g": "Construcción y mantenimiento", "items": [
+      {"id": "construccion", "n": "Materiales de construcción", "code": "30000000", "on": false, "w": ["cemento", "blocks", "varillas", "arena", "pintura", "zinc"]},
+      {"id": "ferreteria", "n": "Ferretería y herramientas", "code": "27000000", "on": false, "w": ["ferretería", "herramientas", "tornillos", "candados"]},
+      {"id": "electricidad", "n": "Electricidad e iluminación", "code": "39000000", "on": false, "w": ["cables eléctricos", "bombillos", "lámparas", "breakers", "material eléctrico"]},
+      {"id": "aires", "n": "Aires y plomería", "code": "40000000", "on": false, "w": ["aires acondicionados", "plomería", "tuberías", "bombas de agua"]},
+      {"id": "edificios", "n": "Mantenimiento de edificios", "code": "72000000", "on": false, "w": ["remodelación", "mantenimiento de edificaciones", "reparación de edificaciones"]},
+      {"id": "fumigacion", "n": "Fumigación y limpieza de locales", "code": "76000000", "on": false, "w": ["fumigación", "limpieza de oficinas", "desratización"]}
+    ]},
+    {"g": "Vehículos y combustibles", "items": [
+      {"id": "combustible", "n": "Combustibles y lubricantes", "code": "15000000", "on": false, "w": ["combustible", "gasoil", "gasolina", "aceite de motor", "gas propano"]},
+      {"id": "vehiculos", "n": "Vehículos y repuestos", "code": "25000000", "on": false, "w": ["vehículos", "repuestos", "neumáticos", "baterías para vehículos"]}
+    ]},
+    {"g": "Otros", "items": [
+      {"id": "seguridad", "n": "Seguridad y equipos tácticos", "code": "46000000", "on": false, "w": ["chalecos", "cascos", "equipos de seguridad", "extintores"]},
+      {"id": "impresion", "n": "Impresión y publicidad", "code": "82000000", "on": false, "w": ["impresión", "publicidad", "letreros", "banners"]},
+      {"id": "eventos", "n": "Eventos y hospedaje", "code": "90000000", "on": false, "w": ["eventos", "hospedaje", "alquiler de salones", "decoración"]},
+      {"id": "deportes", "n": "Deportes", "code": "49000000", "on": false, "w": ["artículos deportivos", "balones", "uniformes deportivos"]},
+      {"id": "agricola", "n": "Agrícola y animales", "code": "10000000", "on": false, "w": ["semillas", "fertilizantes", "plantas", "animales vivos", "alimento animal"]}
+    ]}
+  ],
+  "exclusiones": ["canino", "mascotas", "alimento para perros", "carnet", "carnetización"],
+  "instituciones": [
+    {"id": "fard", "n": "Fuerza Aérea", "m": ["fuerza aerea"], "s": 2},
+    {"id": "ard", "n": "Armada", "m": ["armada"], "s": 2},
+    {"id": "erd", "n": "Ejército", "m": ["ejercito"], "s": 2},
+    {"id": "pn", "n": "Policía Nacional", "m": ["policia nacional"], "s": 1},
+    {"id": "mide", "n": "Ministerio de Defensa", "m": ["ministerio de defensa"], "s": 1},
+    {"id": "hmil", "n": "Hospitales militares", "m": ["hospital militar", "ramon de lara", "fuerzas armadas"], "s": 1},
+    {"id": "comedores", "n": "Comedores Económicos", "m": ["comedores economicos"], "s": 1},
+    {"id": "inabie", "n": "INABIE", "m": ["inabie", "bienestar estudiantil"], "s": 1},
+    {"id": "hosp", "n": "Hospitales públicos", "m": ["hospital", "servicio nacional de salud", "servicio regional de salud"], "s": 1},
+    {"id": "ayunt", "n": "Ayuntamientos", "m": ["ayuntamiento", "junta de distrito", "junta municipal"], "s": 0}
+  ]
+}
