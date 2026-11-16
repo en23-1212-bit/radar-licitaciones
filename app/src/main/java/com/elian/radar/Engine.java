@@ -63,7 +63,7 @@ public final class Engine {
                 if (nuevo) {
                     p = new JSONObject();
                     p.put("first", ahora);
-                    procs.put(code, p);
+                    synchronized (procs) { procs.put(code, p); }
                     nuevosN++;
                 }
                 String cambio = copiar(raw, p);
@@ -96,14 +96,14 @@ public final class Engine {
                 try {
                     JSONArray arts = Dgcp.list("procesos/articulos", Dgcp.params("proceso", code), 1, 30_000);
                     JSONArray compact = new JSONArray();
-                    for (int k = 0; k < arts.length() && k < 60; k++) {
+                    for (int k = 0; k < arts.length() && k < 30; k++) {
                         JSONObject a = arts.optJSONObject(k);
                         if (a == null) continue;
                         String d = a.optString("descripcion_usuario", "");
                         String d2 = a.optString("descripcion_articulo", "");
                         String texto = (d.isEmpty() || "null".equals(d) ? "" : d) + (d2.isEmpty() || "null".equals(d2) ? "" : " · " + d2);
                         JSONArray x = new JSONArray();
-                        x.put(recortar(texto, 160));
+                        x.put(recortar(texto, 140));
                         x.put(a.optString("subclase_unspsc", a.optString("clase_unspsc", "")));
                         x.put(a.optDouble("cantidad", 0));
                         x.put(a.optString("unidad_medida", ""));
@@ -111,6 +111,7 @@ public final class Engine {
                         compact.put(x);
                     }
                     p.put("arts", compact);
+                    p.put("nArts", compact.length());
                     p.put("artsOk", true);
                 } catch (Http.HttpError e) {
                     if (e.code == 404 || e.code == 400) p.put("artsOk", true);
@@ -196,6 +197,7 @@ public final class Engine {
             }
 
             limpiar(procs, ahora);
+            reevaluar(c);
             put(h, "lastOk", ahora);
             put(h, "errs", 0);
             put(h, "lastError", "");
@@ -417,23 +419,54 @@ public final class Engine {
     }
 
     static List<String> claves(JSONObject o) {
-        List<String> r = new ArrayList<>();
-        Iterator<String> it = o.keys();
-        while (it.hasNext()) r.add(it.next());
-        return r;
+        synchronized (o) {
+            List<String> r = new ArrayList<>();
+            Iterator<String> it = o.keys();
+            while (it.hasNext()) r.add(it.next());
+            return r;
+        }
+    }
+
+    /** Clave para saber si el resultado guardado de una licitación sigue sirviendo. */
+    static String claveEval(JSONObject p, int ver) {
+        return ver + "|" + p.optString("h") + "|" + p.optBoolean("artsOk") + "|" + p.optInt("nArts", 0);
+    }
+
+    /** Resultado de comparar una licitación con los ajustes, guardado para no recalcular cada vez. */
+    public static JSONObject resultado(JSONObject p, Settings s, int ver) {
+        String k = claveEval(p, ver);
+        JSONObject m = p.optJSONObject("m");
+        if (m != null && k.equals(p.optString("mk"))) return m;
+        m = Evaluador.evaluar(p, s).json();
+        try { p.put("m", m); p.put("mk", k); } catch (JSONException ignored) {}
+        return m;
+    }
+
+    /** Recalcula todo de una vez (después de una revisión o de cambiar ajustes). */
+    public static void reevaluar(Context c) {
+        Settings s = Store.settings(c);
+        int ver = Store.settingsVer(c);
+        long ahora = System.currentTimeMillis();
+        JSONObject procs = Store.obj(c, "procs");
+        for (String code : claves(procs)) {
+            JSONObject p = procs.optJSONObject(code);
+            if (p == null) continue;
+            if (!abierta(p, ahora) && p.optString("status", "").isEmpty()) continue;
+            synchronized (p) { resultado(p, s, ver); }
+        }
     }
 
     /** Borra lo viejo para que siempre ocupe poco. */
     static void limpiar(JSONObject procs, long ahora) {
         for (String code : claves(procs)) {
             JSONObject p = procs.optJSONObject(code);
-            if (p == null) { procs.remove(code); continue; }
+            if (p == null) { synchronized (procs) { procs.remove(code); } continue; }
             String st = p.optString("status", "");
             long cierre = p.optLong("cierre", 0);
             long ref = cierre > 0 ? cierre : p.optLong("first", ahora);
             boolean importante = !st.isEmpty() && !"descartada".equals(st);
             long vida = importante ? 400 * Const.D : 30 * Const.D;
-            if (ahora - ref > vida) procs.remove(code);
+            if (ahora - ref > vida) { synchronized (procs) { procs.remove(code); } }
             else if (!importante && !abierta(p, ahora) && cierre > 0 && ahora - cierre > 2 * Const.D) {
                 p.remove("arts"); // ya cerró: no hace falta guardar sus artículos
             }

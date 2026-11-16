@@ -47,6 +47,44 @@ public final class Text {
         return p;
     }
 
+    /** Primera palabra de una frase, ya normalizada. */
+    public static String primerToken(String palabra) {
+        String limpio = NO_ALNUM.matcher(norm(palabra)).replaceAll(" ").trim();
+        int sp = limpio.indexOf(' ');
+        return sp < 0 ? limpio : limpio.substring(0, sp);
+    }
+
+    /** Formas que acepta una palabra (singular/plural), igual que pattern(). */
+    public static String[] formas(String x) {
+        java.util.List<String> f = new java.util.ArrayList<>();
+        f.add(x); f.add(x + "s"); f.add(x + "es");
+        if (x.length() > 4 && x.endsWith("s")) f.add(x.substring(0, x.length() - 1));
+        if (x.length() > 5 && x.endsWith("es")) f.add(x.substring(0, x.length() - 2));
+        return f.toArray(new String[0]);
+    }
+
+    private static final Map<String, Pattern> COMBINADAS = new HashMap<>();
+
+    /** Un solo patrón con todas las palabras: sirve para descartar rápido los textos que no tienen ninguna. */
+    public static synchronized Pattern combinada(java.util.List<String> palabras) {
+        if (palabras.isEmpty()) return null;
+        String key = String.join("\u0001", palabras);
+        Pattern p = COMBINADAS.get(key);
+        if (p != null) return p;
+        StringBuilder sb = new StringBuilder();
+        for (String w : palabras) {
+            Pattern x = pattern(w);
+            if (x == null) continue;
+            if (sb.length() > 0) sb.append('|');
+            sb.append("(?:").append(x.pattern()).append(')');
+        }
+        if (sb.length() == 0) return null;
+        p = Pattern.compile(sb.toString());
+        if (COMBINADAS.size() > 30) COMBINADAS.clear();
+        COMBINADAS.put(key, p);
+        return p;
+    }
+
     /** true si el texto (ya pasado por prep) contiene la palabra o frase completa. */
     public static boolean has(String textoPrep, String palabra) {
         Pattern p = pattern(palabra);

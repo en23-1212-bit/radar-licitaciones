@@ -38,6 +38,63 @@ public final class Settings {
     public int diasMin = 3;
     public String resumen = "07:30", silencioIni = "21:00", silencioFin = "06:30", recordar = "3y1", rpe = "";
 
+    /** Una palabra buscada y la categoría a la que pertenece (null = mis nombres / exclusión). */
+    public static final class W {
+        public final String palabra;
+        public final Cat cat;
+        W(String palabra, Cat cat) { this.palabra = palabra; this.cat = cat; }
+    }
+
+    // Índice por primera palabra: así cada texto se revisa con búsquedas directas, no probando cientos de palabras.
+    private java.util.Map<String, List<W>> idxA, idxI, idxE;
+
+    private static void indexar(java.util.Map<String, List<W>> m, String palabra, Cat cat) {
+        String t = Text.primerToken(palabra);
+        if (t.isEmpty()) return;
+        W w = new W(palabra, cat);
+        for (String f : Text.formas(t)) {
+            List<W> l = m.get(f);
+            if (l == null) { l = new ArrayList<>(); m.put(f, l); }
+            l.add(w);
+        }
+    }
+
+    private synchronized void preparar() {
+        if (idxA != null) return;
+        java.util.Map<String, List<W>> a = new java.util.HashMap<>(), in = new java.util.HashMap<>(), e = new java.util.HashMap<>();
+        for (Cat c : activas) for (String w : c.palabras) indexar(a, w, c);
+        for (String w : mias) indexar(a, w, null);
+        for (Cat c : inactivas) for (String w : c.palabras) indexar(in, w, c);
+        for (String w : excluir) indexar(e, w, null);
+        idxE = e; idxI = in; idxA = a;
+    }
+
+    private static List<W> buscar(java.util.Map<String, List<W>> idx, String prep, String[] toks, boolean basta) {
+        List<W> out = new ArrayList<>();
+        java.util.Set<W> vistos = new java.util.HashSet<>();
+        for (String t : toks) {
+            List<W> l = idx.get(t);
+            if (l == null) continue;
+            for (W w : l) {
+                if (!vistos.add(w)) continue;
+                if (Text.has(prep, w.palabra)) { out.add(w); if (basta) return out; }
+            }
+        }
+        return out;
+    }
+
+    public static String[] tokens(String prep) {
+        String t = prep.trim();
+        return t.isEmpty() ? new String[0] : t.split(" ");
+    }
+
+    /** Palabras de lo que vende que aparecen en el texto. */
+    public List<W> activasEn(String prep, String[] toks) { preparar(); return buscar(idxA, prep, toks, false); }
+    /** Palabras de categorías no marcadas que aparecen. */
+    public List<W> inactivasEn(String prep, String[] toks) { preparar(); return buscar(idxI, prep, toks, false); }
+    /** ¿Tiene alguna palabra prohibida? */
+    public boolean excluido(String prep) { preparar(); return !buscar(idxE, prep, tokens(prep), true).isEmpty(); }
+
     /** Valores por defecto de los ajustes (lo que se guarda en estado.json → settings). */
     public static JSONObject defaults(JSONObject catalogo) {
         JSONObject s = new JSONObject();

@@ -26,34 +26,52 @@ public class Bridge {
 
     // ---------------- pantallas ----------------
 
+    /** Todas las tarjetas: abiertas que le sirven + las que guardó. Usa resultados ya calculados (rápido). */
+    private List<JSONObject> tarjetas(long ahora) throws JSONException {
+        com.elian.radar.Settings s = Store.settings(a);
+        int ver = Store.settingsVer(a);
+        JSONObject procs = Store.obj(a, "procs");
+        List<JSONObject> out = new ArrayList<>();
+        for (String code : Engine.claves(procs)) {
+            JSONObject p = procs.optJSONObject(code);
+            if (p == null) continue;
+            String st = p.optString("status", "");
+            if ("descartada".equals(st)) continue;
+            boolean abierta = Engine.abierta(p, ahora);
+            if (!abierta && st.isEmpty()) continue;
+            JSONObject m;
+            synchronized (p) { m = Engine.resultado(p, s, ver); }
+            if (!m.optBoolean("mostrar") && st.isEmpty()) continue;
+            out.add(card(code, p, m, ahora));
+        }
+        ordenar(out);
+        return out;
+    }
+
     @JavascriptInterface
     public String home() {
         try {
             long ahora = System.currentTimeMillis();
-            com.elian.radar.Settings s = Store.settings(a);
-            JSONObject procs = Store.obj(a, "procs");
-            List<JSONObject> nuevas = new ArrayList<>();
-            int semana = 0, nuevasN = 0;
-            for (String code : Engine.claves(procs)) {
-                JSONObject p = procs.optJSONObject(code);
-                if (p == null || !Engine.abierta(p, ahora)) continue;
-                String st = p.optString("status", "");
-                if ("descartada".equals(st)) continue;
-                Evaluador.Res r = Evaluador.evaluar(p, s);
-                if (!r.mostrar) continue;
-                long dias = Engine.diasRestantes(p, ahora);
-                if (dias <= 7) semana++;
-                if (st.isEmpty() && ahora - p.optLong("first", 0) < 72 * Const.H && !"baja".equals(r.prioridad)) {
-                    nuevasN++;
-                    nuevas.add(card(code, p, r, ahora));
-                }
+            List<JSONObject> todas = tarjetas(ahora);
+            JSONArray nuevas = new JSONArray(), pronto = new JSONArray();
+            int nNuevas = 0, nPronto = 0, guardadas = 0;
+            for (JSONObject x : todas) {
+                boolean baja = "baja".equals(x.optString("prio"));
+                boolean saved = !x.optString("status").isEmpty();
+                if (saved) guardadas++;
+                if (!saved && !baja && x.optBoolean("nueva") && x.optBoolean("abierta")) { nNuevas++; if (nuevas.length() < 6) nuevas.put(x); }
             }
-            ordenar(nuevas);
+            List<JSONObject> porFecha = new ArrayList<>(todas);
+            Collections.sort(porFecha, (x, y) -> Long.compare(x.optLong("dias"), y.optLong("dias")));
+            for (JSONObject x : porFecha) {
+                boolean baja = "baja".equals(x.optString("prio"));
+                if (!x.optBoolean("abierta") || baja || x.optLong("dias") > 7) continue;
+                nPronto++;
+                if (pronto.length() < 6) pronto.put(x);
+            }
             JSONObject o = new JSONObject();
             o.put("health", estadoCorto());
-            o.put("nuevas", new JSONArray(nuevas.subList(0, Math.min(15, nuevas.size()))));
-            o.put("nNuevas", nuevasN);
-            o.put("semana", semana);
+            o.put("nuevas", nuevas).put("nNuevas", nNuevas).put("pronto", pronto).put("nPronto", nPronto).put("guardadas", guardadas);
             double debe = 0;
             int viejas = 0;
             JSONArray inv = Store.arr(a, "invoices");
@@ -64,9 +82,8 @@ public class Bridge {
                 if ((ahora - f.optLong("fecha", ahora)) / Const.D > 60) viejas++;
             }
             o.put("debe", Text.monto(debe));
-            o.put("debeN", debe);
             o.put("viejas", viejas);
-            o.put("primeraVez", Store.obj(a, "procs").length() == 0);
+            o.put("primeraVez", Store.obj(a, "health").optLong("lastOk", 0) == 0 && Store.obj(a, "procs").length() == 0);
             return o.toString();
         } catch (Exception e) {
             return err(e);
@@ -76,19 +93,7 @@ public class Bridge {
     @JavascriptInterface
     public String list() {
         try {
-            long ahora = System.currentTimeMillis();
-            com.elian.radar.Settings s = Store.settings(a);
-            JSONObject procs = Store.obj(a, "procs");
-            List<JSONObject> out = new ArrayList<>();
-            for (String code : Engine.claves(procs)) {
-                JSONObject p = procs.optJSONObject(code);
-                if (p == null || !Engine.abierta(p, ahora) || "descartada".equals(p.optString("status"))) continue;
-                Evaluador.Res r = Evaluador.evaluar(p, s);
-                if (!r.mostrar) continue;
-                out.add(card(code, p, r, ahora));
-            }
-            ordenar(out);
-            return new JSONArray(out).toString();
+            return new JSONArray(tarjetas(System.currentTimeMillis())).toString();
         } catch (Exception e) {
             return err(e);
         }
@@ -99,8 +104,9 @@ public class Bridge {
         try {
             JSONObject p = Store.obj(a, "procs").optJSONObject(code);
             if (p == null) return "{}";
-            Evaluador.Res r = Evaluador.evaluar(p, Store.settings(a));
-            JSONObject o = card(code, p, r, System.currentTimeMillis());
+            JSONObject m;
+            synchronized (p) { m = Engine.resultado(p, Store.settings(a), Store.settingsVer(a)); }
+            JSONObject o = card(code, p, m, System.currentTimeMillis());
             o.put("desc", p.optString("desc"));
             o.put("arts", p.optJSONArray("arts") != null ? p.optJSONArray("arts") : new JSONArray());
             o.put("apertura", Engine.fechaCorta(p.optLong("apert")));
@@ -125,12 +131,13 @@ public class Bridge {
             int ofertadas = 0, ganadas = 0;
             double adjudicado = 0;
             com.elian.radar.Settings s = Store.settings(a);
+            int ver = Store.settingsVer(a);
             for (String code : Engine.claves(procs)) {
                 JSONObject p = procs.optJSONObject(code);
                 if (p == null) continue;
                 String st = p.optString("status", "");
                 if (!g.has(st)) continue;
-                JSONObject c = card(code, p, Evaluador.evaluar(p, s), ahora);
+                JSONObject c = card(code, p, Engine.resultado(p, s, ver), ahora);
                 c.put("oferta", p.optDouble("oferta", 0));
                 c.put("ganadores", p.optJSONArray("ganadores") != null ? p.optJSONArray("ganadores") : new JSONArray());
                 g.getJSONArray(st).put(c);
@@ -159,7 +166,7 @@ public class Bridge {
                 double v = Double.parseDouble(oferta.replaceAll("[^0-9.]", ""));
                 if (v > 0) p.put("oferta", v);
             }
-            Store.save(a);
+            Store.saveAsync(a);
             return "ok";
         } catch (Exception e) {
             return err(e);
@@ -174,7 +181,7 @@ public class Bridge {
             if (p == null) return "{}";
             p.put("status", "descartada");
             p.put("motivo", motivo);
-            Store.save(a);
+            Store.saveAsync(a);
             JSONObject o = new JSONObject();
             if ("producto".equals(motivo)) {
                 Evaluador.Res r = Evaluador.evaluar(p, Store.settings(a));
@@ -237,7 +244,7 @@ public class Bridge {
             } else {
                 for (int i = 0; i < inv.length(); i++) if (id.equals(inv.getJSONObject(i).optString("id"))) inv.put(i, f);
             }
-            Store.save(a);
+            Store.saveAsync(a);
             return "ok";
         } catch (Exception e) {
             return err(e);
@@ -255,7 +262,7 @@ public class Bridge {
                 else if ("borrar".equals(accion)) { inv.remove(i); }
                 break;
             }
-            Store.save(a);
+            Store.saveAsync(a);
             return "ok";
         } catch (Exception e) {
             return err(e);
@@ -277,8 +284,10 @@ public class Bridge {
             String problema = com.elian.radar.Settings.validar(s);
             if (problema != null) return problema;
             Store.put(a, "settings", s);
-            Store.save(a);
+            Store.subirVersionAjustes(a);
+            Store.saveAsync(a);
             Programador.programarSiguiente(a);
+            recalcular();
             return "ok";
         } catch (Exception e) {
             return err(e);
@@ -292,8 +301,22 @@ public class Bridge {
     @JavascriptInterface
     public String restoreDefaults() {
         Store.put(a, "settings", com.elian.radar.Settings.defaults(Store.catalogo(a)));
-        Store.save(a);
+        Store.subirVersionAjustes(a);
+        Store.saveAsync(a);
+        recalcular();
         return "ok";
+    }
+
+    private static final java.util.concurrent.atomic.AtomicInteger recalc = new java.util.concurrent.atomic.AtomicInteger();
+
+    /** Recalcula en segundo plano, una sola vez aunque cambie varios ajustes seguidos. */
+    private void recalcular() {
+        final int turno = recalc.incrementAndGet();
+        new Thread(() -> {
+            Http.dormir(600);
+            if (turno != recalc.get()) return;
+            try { Engine.reevaluar(a.getApplicationContext()); Store.saveAsync(a); } catch (Exception ignored) {}
+        }, "radar-recalcular").start();
     }
 
     @JavascriptInterface
@@ -483,7 +506,7 @@ public class Bridge {
         }
     }
 
-    private JSONObject card(String code, JSONObject p, Evaluador.Res r, long ahora) throws JSONException {
+    private JSONObject card(String code, JSONObject p, JSONObject m, long ahora) throws JSONException {
         long dias = Engine.diasRestantes(p, ahora);
         JSONObject o = new JSONObject();
         o.put("code", code)
@@ -496,12 +519,13 @@ public class Bridge {
                 .put("cierre", Engine.fechaCorta(p.optLong("cierre")))
                 .put("dias", dias)
                 .put("abierta", Engine.abierta(p, ahora))
-                .put("prio", r.prioridad)
-                .put("why", r.porQue)
+                .put("prio", m.optString("prio"))
+                .put("why", m.optString("why"))
                 .put("status", p.optString("status", ""))
                 .put("url", p.optString("url", ""))
                 .put("nueva", ahora - p.optLong("first", 0) < 48 * Const.H)
-                .put("grupo", grupo(p.optString("inst")));
+                .put("grupo", grupo(p.optString("inst")))
+                .put("saved", !p.optString("status", "").isEmpty());
         return o;
     }
 

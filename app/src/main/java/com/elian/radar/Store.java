@@ -75,13 +75,41 @@ public final class Store {
         try { get(c).put(key, v); } catch (JSONException ignored) {}
     }
 
+    private static final java.util.concurrent.ExecutorService GUARDAR = java.util.concurrent.Executors.newSingleThreadExecutor();
+    private static final java.util.concurrent.atomic.AtomicBoolean pendiente = new java.util.concurrent.atomic.AtomicBoolean(false);
+
+    /** Guarda en segundo plano (no traba la pantalla). Varios cambios seguidos se guardan una sola vez. */
+    public static void saveAsync(Context c) {
+        final Context app = c.getApplicationContext();
+        if (pendiente.compareAndSet(false, true)) {
+            GUARDAR.execute(() -> {
+                pendiente.set(false);
+                save(app);
+            });
+        }
+    }
+
+    /** Versión de los ajustes: cambia cada vez que se guardan, para saber cuándo recalcular. */
+    public static synchronized int settingsVer(Context c) {
+        return get(c).optInt("settingsVer", 1);
+    }
+
+    public static synchronized void subirVersionAjustes(Context c) {
+        try { get(c).put("settingsVer", settingsVer(c) + 1); } catch (JSONException ignored) {}
+    }
+
     public static synchronized void save(Context c) {
         File dir = c.getFilesDir();
         File tmp = new File(dir, "estado.tmp");
         File main = new File(dir, "estado.json");
         File bak = new File(dir, "estado.bak");
+        String data = null;
+        for (int intento = 0; intento < 3 && data == null; intento++) {
+            try { data = get(c).toString(); } catch (RuntimeException e) { Http.dormir(80); }
+        }
+        if (data == null) return;
         try (OutputStream out = new FileOutputStream(tmp)) {
-            out.write(get(c).toString().getBytes(StandardCharsets.UTF_8));
+            out.write(data.getBytes(StandardCharsets.UTF_8));
             out.flush();
             ((FileOutputStream) out).getFD().sync();
         } catch (IOException e) {

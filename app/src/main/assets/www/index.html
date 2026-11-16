@@ -8,18 +8,20 @@
 :root{--bg:#f2f3f6;--card:#fff;--ink:#14213d;--mute:#667085;--line:#e4e7ec;--acc:#b42318;--accbg:#fdeceb;
 --ok:#15803d;--okbg:#e8f6ec;--warn:#b45309;--warnbg:#fdf3e2;--blue:#1d4ed8;--bluebg:#e8eefc;--gray:#64748b;--graybg:#eef1f4;--r:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+button,a,.card,.mini,.opt,label,input,select{touch-action:manipulation}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 html,body{background:var(--bg)}
 body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);font-size:15px;line-height:1.45}
-.app{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:84px}
+.app{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:78px}
 .bar{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
 .bar h1{font-size:19px;font-weight:800;flex:1}
 .bar .back{all:unset;cursor:pointer;font-size:24px;line-height:1;padding:0 8px 0 0;display:none}
 .bar .back.on{display:block}
 .tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:30}
-.tabs button{all:unset;cursor:pointer;text-align:center;padding:8px 0 10px;font-size:11.5px;font-weight:600;color:var(--mute)}
-.tabs button i{display:block;font-style:normal;font-size:21px;line-height:1.25}
+.tabs button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;font-size:11.5px;font-weight:600;color:var(--mute)}
+.tabs button i{display:flex;justify-content:center;width:56px;padding:3px 0;border-radius:99px;font-style:normal}
 .tabs button.on{color:var(--ink)}
-.tabs button.on i{background:var(--bluebg);border-radius:99px;margin:0 16px}
+.tabs button.on i{background:var(--bluebg);color:var(--blue)}
 .screen{display:none;padding:14px 14px 10px}.screen.on{display:block}
 h2{font-size:17px;font-weight:800;margin:18px 2px 10px}
 h2:first-child{margin-top:4px}
@@ -50,6 +52,7 @@ h3{font-size:15.5px;font-weight:700;line-height:1.3}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:11px;font-weight:700;font-size:14px;background:var(--ink);color:#fff;text-align:center}
 .btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn:active,.opt:active,.mini:active,.menu>button:active,.tabs button:active,.seg button:active,.row-l:active{opacity:.6}
 .btn.big{padding:14px;font-size:15.5px;border-radius:12px}
 .btn.ok{background:var(--ok)}
 .btn.red{background:var(--acc)}
@@ -65,7 +68,7 @@ h3{font-size:15.5px;font-weight:700;line-height:1.3}
 .menu{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .menu>button{all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:14px;border-bottom:1px solid var(--line)}
 .menu>button:last-child{border:0}
-.menu>button .ic{width:38px;height:38px;border-radius:10px;background:var(--graybg);display:grid;place-items:center;font-size:19px;flex:none}
+.menu>button .ic{width:38px;height:38px;border-radius:10px;background:var(--bluebg);color:var(--blue);display:grid;place-items:center;flex:none}
 .menu>button span{flex:1}
 .menu>button span small{display:block;color:var(--mute);font-size:12.5px;font-weight:500}
 .menu>button b{font-size:15px}
@@ -108,6 +111,29 @@ table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;font-size:11px;text-transform:uppercase;color:var(--mute);font-weight:700;padding:6px;border-bottom:1px solid var(--line)}
 td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
+
+.seg{display:flex;background:#e6e9ef;border-radius:12px;padding:3px;gap:2px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{all:unset;cursor:pointer;flex:1 0 auto;text-align:center;padding:8px 10px;border-radius:9px;font-size:13px;font-weight:700;color:var(--mute);white-space:nowrap}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.seg button b{font-weight:800;color:var(--acc);margin-left:3px}
+.search{display:flex;gap:8px;margin-bottom:10px}
+.search input{flex:1}
+.search select{width:auto;flex:none;font-size:13.5px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:20px 2px 10px}
+.sec h2{margin:0}
+.sec a{font-size:13.5px;font-weight:700;color:var(--blue);text-decoration:none;cursor:pointer}
+.rows{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.row-l{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.row-l:last-child{border:0}
+.row-l .d{flex:none;width:46px;text-align:center;border-radius:10px;padding:5px 0;font-weight:800;font-size:17px;line-height:1.05}
+.row-l .d small{display:block;font-size:10px;font-weight:700;text-transform:uppercase}
+.row-l .t{flex:1;min-width:0}
+.row-l .t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-l .t span{font-size:12.5px;color:var(--mute)}
+.d-bad{background:var(--accbg);color:var(--acc)}.d-warn{background:var(--warnbg);color:var(--warn)}.d-gray{background:var(--graybg);color:var(--gray)}
+.kpis3{grid-template-columns:1fr 1fr 1fr}
+.kpis3 .kpi b{font-size:21px}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(30px);opacity:0;background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-weight:600;font-size:13.5px;transition:.25s;z-index:70;max-width:92vw;visibility:hidden;text-align:center}
 .toast.on{transform:translateX(-50%);opacity:1;visibility:visible}
 </style>
@@ -119,16 +145,17 @@ tr:last-child td{border-bottom:0}
   <section class="screen on" id="inicio" data-t="Radar"><div id="inicio-c"></div></section>
 
   <section class="screen" id="lic" data-t="Licitaciones">
-    <div class="filters" id="flt">
-      <button class="on" data-f="all">Todas</button>
-      <button data-f="alta">Prioridad alta</button>
-      <button data-f="semana">Cierran ≤ 7 días</button>
-      <button data-f="mil">Militares y Policía</button>
-      <button data-f="salud">Hospitales</button>
-      <button data-f="social">Comedores</button>
-      <button data-f="baja">Solo por código</button>
+    <div class="seg" id="seg">
+      <button data-f="nuevas">Nuevas</button>
+      <button data-f="pronto">Cierran pronto</button>
+      <button data-f="todas">Todas</button>
+      <button data-f="guardadas">Guardadas</button>
+      <button data-f="baja">Por revisar</button>
     </div>
+    <div class="search"><input id="q" type="search" placeholder="Buscar institución, producto o código" autocomplete="off">
+      <select id="grp"><option value="">Todas</option><option value="mil">Militares</option><option value="salud">Hospitales</option><option value="social">Comedores</option><option value="otro">Otras</option></select></div>
     <div class="grid" id="list"></div>
+    <div id="mas"></div>
   </section>
 
   <section class="screen" id="ofertas" data-t="Mis ofertas"><div id="ofertas-c"></div></section>
@@ -137,14 +164,14 @@ tr:last-child td{border-bottom:0}
 
   <section class="screen" id="ajustes" data-t="Ajustes">
     <div class="menu">
-      <button onclick="go('a-vendo')"><span class="ic">📦</span><span><b>Qué vendo</b><small id="sum-vendo"></small></span></button>
-      <button onclick="go('a-palabras')"><span class="ic">🔤</span><span><b>Mis nombres y exclusiones</b><small>Palabras propias, lo que nunca debe salir y probador</small></span></button>
-      <button onclick="go('a-rangos')"><span class="ic">📏</span><span><b>Rangos</b><small>Tamaño, montos, días e instituciones</small></span></button>
-      <button onclick="go('a-avisos')"><span class="ic">🔔</span><span><b>Avisos</b><small>Cuándo te avisa</small></span></button>
+      <button onclick="go('a-vendo')"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span><span><b>Qué vendo</b><small id="sum-vendo"></small></span></button>
+      <button onclick="go('a-palabras')"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg></span><span><b>Mis nombres y exclusiones</b><small>Palabras propias, lo que nunca debe salir y probador</small></span></button>
+      <button onclick="go('a-rangos')"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M3 17 17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></span><span><b>Rangos</b><small>Tamaño, montos, días e instituciones</small></span></button>
+      <button onclick="go('a-avisos')"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span><span><b>Avisos</b><small>Cuándo te avisa</small></span></button>
     </div>
     <div class="menu" style="margin-top:12px">
-      <button onclick="go('a-vigila')"><span class="ic">🛡️</span><span><b>Autovigilancia</b><small id="sum-vigila"></small></span></button>
-      <button onclick="go('a-copia')"><span class="ic">💾</span><span><b>Copia y versión</b><small id="sum-version"></small></span></button>
+      <button onclick="go('a-vigila')"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>Autovigilancia</b><small id="sum-vigila"></small></span></button>
+      <button onclick="go('a-copia')"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3M8 21v-7h8v7"/></svg></span><span><b>Copia y versión</b><small id="sum-version"></small></span></button>
     </div>
   </section>
 
@@ -216,11 +243,11 @@ tr:last-child td{border-bottom:0}
   <section class="screen" id="a-copia" data-t="Copia y versión" data-back="ajustes"><div id="copia-c"></div></section>
 
   <nav class="tabs" id="tabs">
-    <button data-v="inicio" class="on"><i>🏠</i>Inicio</button>
-    <button data-v="lic"><i>📋</i>Licitaciones</button>
-    <button data-v="ofertas"><i>📈</i>Ofertas</button>
-    <button data-v="cobros"><i>💵</i>Cobros</button>
-    <button data-v="ajustes"><i>⚙️</i>Ajustes</button>
+    <button data-v="inicio" class="on"><i><svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></i>Inicio</button>
+    <button data-v="lic"><i><svg class="i" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3"/></svg></i>Licitaciones</button>
+    <button data-v="ofertas"><i><svg class="i" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></i>Ofertas</button>
+    <button data-v="cobros"><i><svg class="i" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></i>Cobros</button>
+    <button data-v="ajustes"><i><svg class="i" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></i>Ajustes</button>
   </nav>
 </div>
 
@@ -229,7 +256,8 @@ tr:last-child td{border-bottom:0}
 
 <script>
 var A = window.Android;
-var CUR = "inicio", FILTRO = "all", S = null, CAT = null, OPEN = {}, LIST = [];
+var CUR = "inicio", FILTRO = "nuevas", S = null, CAT = null, OPEN = {}, LIST = null, VISIBLES = 30, qT = null;
+function sucio(){ LIST = null; }
 
 function J(s){ try { return JSON.parse(s); } catch(e){ return {}; } }
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
@@ -262,8 +290,8 @@ function render(){
             "a-rangos": rRangos, "a-avisos": rAvisos, "a-vigila": rVigila, "a-copia": rCopia }[CUR];
   if (f) f();
 }
-function onResume(){ S = null; render(); }
-function onRunDone(){ render(); }
+function onResume(){ S = null; sucio(); render(); }
+function onRunDone(){ sucio(); render(); }
 
 // ---------- tarjetas ----------
 var PC = { alta: ["c-bad", "Alta"], media: ["c-warn", "Media"], baja: ["c-gray", "Solo código"] };
@@ -277,10 +305,10 @@ function tarjeta(x, grande){
   h += '<div class="meta">' + (grande ? "" : '<span class="chip c-blue">' + esc(x.mod) + '</span>') + dchip(x) + '</div>';
   if (!grande && x.why) h += '<div class="why">🔎 Salió por: ' + esc(x.why) + '</div>';
   if (x.status) h += '<div class="meta"><span class="chip c-ok">' + esc(ST[x.status] || x.status) + '</span><button class="btn alt" onclick="detalle(\'' + esc(x.code) + '\')">Ver</button></div>';
-  else h += '<div class="' + (grande ? 'hbtn' : 'meta') + '"><button class="btn' + (grande ? ' big' : '') + '" onclick="interes(\'' + esc(x.code) + '\')">☆ Me interesa</button><button class="btn alt' + (grande ? ' big' : '') + '" onclick="noInteresa(\'' + esc(x.code) + '\')">No me interesa</button>' + (grande ? '' : '<button class="btn alt" onclick="A.open(\'' + esc(x.url) + '\')">Portal</button>') + '</div>';
+  else h += '<div class="hbtn"><button class="btn' + (grande ? ' big' : '') + '" onclick="interes(\'' + esc(x.code) + '\')">☆ Me interesa</button><button class="btn alt' + (grande ? ' big' : '') + '" onclick="noInteresa(\'' + esc(x.code) + '\')">No me interesa</button></div>';
   return h + '</div>';
 }
-function interes(code){ A.setStatus(code, "interes", ""); toast("Guardada · te recuerdo antes del cierre"); render(); }
+function interes(code){ A.setStatus(code, "interes", ""); sucio(); toast("Guardada · te recuerdo antes del cierre"); render(); }
 function noInteresa(code){
   sheet('<b style="font-size:17px">¿Por qué no te interesa?</b>' +
     '<button class="opt" onclick="descartar(\'' + code + '\',\'producto\')">No vendo ese producto</button>' +
@@ -289,7 +317,7 @@ function noInteresa(code){
     '<button class="opt" onclick="descartar(\'' + code + '\',\'esta\')">Solo esta vez</button>');
 }
 function descartar(code, motivo){
-  var r = J(A.descartar(code, motivo)); cerrar(); render();
+  var r = J(A.descartar(code, motivo)); sucio(); cerrar(); render();
   if (motivo === "producto" && r.palabras && r.palabras.length) {
     sheet('<b style="font-size:17px">¿Quieres que no vuelvan a salir?</b><div class="small mute">Salió por estas palabras. Toca las que nunca quieres ver:</div><div class="words">' +
       r.palabras.map(function(w){ return '<span class="x tap" onclick="excluir(this,\'' + esc(w).replace(/'/g, "") + '\')">✕ ' + esc(w) + '</span>'; }).join("") + '</div><button class="btn alt full" onclick="cerrar()">Listo</button>');
@@ -316,42 +344,79 @@ function detalle(code){
 }
 function estado(code, s){
   var monto = "";
-  if (s === "ofertada") { sheet('<b style="font-size:17px">¿Por cuánto ofertaste?</b><input id="of-m" inputmode="numeric" placeholder="RD$ (opcional)"><button class="btn big full" onclick="A.setStatus(\'' + code + '\',\'ofertada\',$(\'of-m\').value);cerrar();toast(\'Guardado\');render()">Guardar</button>'); return; }
-  A.setStatus(code, s, monto); cerrar(); toast(s ? "Guardado: " + ST[s] : "Quitada"); render();
+  if (s === "ofertada") { sheet('<b style="font-size:17px">¿Por cuánto ofertaste?</b><input id="of-m" inputmode="numeric" placeholder="RD$ (opcional)"><button class="btn big full" onclick="A.setStatus(\'' + code + '\',\'ofertada\',$(\'of-m\').value);sucio();cerrar();toast(\'Guardado\');render()">Guardar</button>'); return; }
+  A.setStatus(code, s, monto); sucio(); cerrar(); toast(s ? "Guardado: " + ST[s] : "Quitada"); render();
 }
 function sheet(html){ $("sheet").innerHTML = html; $("modal").classList.add("on"); }
 function cerrar(){ $("modal").classList.remove("on"); }
 
 // ---------- inicio ----------
+function fila(x){
+  var c = x.dias <= 2 ? "d-bad" : x.dias <= 7 ? "d-warn" : "d-gray";
+  return '<div class="row-l" onclick="detalle(\'' + esc(x.code) + '\')"><div class="d ' + c + '">' + (x.dias <= 0 ? "Hoy" : x.dias) + (x.dias > 0 ? '<small>' + (x.dias == 1 ? "día" : "días") + '</small>' : '') + '</div>' +
+    '<div class="t"><b>' + esc(x.corto) + ' · ' + esc(x.tit) + '</b><span>' + esc(x.montoTxt) + (x.status ? ' · ' + esc(ST[x.status] || "") : '') + '</span></div></div>';
+}
+function verLista(f){ FILTRO = f; go("lic"); }
 function rInicio(){
   var d = J(A.home()), h = d.health || {};
-  var html = '<div class="health ' + (h.nivel || "warn") + '" onclick="go(\'a-vigila\')"><span class="led"></span><div><b>' + esc(h.msg || "") + '</b> ' + (h.lastOk && h.lastOk !== "nunca" ? 'Última revisión ' + esc(h.lastOk) : '') + (h.next && h.next !== "—" ? ' · próxima ' + esc(h.next) : '') + '</div></div>';
+  var html = '<div class="health ' + (h.nivel || "warn") + '" onclick="go(\'a-vigila\')"><span class="led"></span><div><b>' + esc(h.msg || "") + '</b> ' + (h.lastOk && h.lastOk !== "nunca" ? 'Revisé ' + esc(h.lastOk) : '') + (h.next && h.next !== "—" ? ' · próxima ' + esc(h.next) : '') + '</div></div>';
   if (d.primeraVez) {
     html += '<h2>¡Bienvenido! 👋</h2><div class="card"><p>Para empezar:</p><ol style="margin:8px 0 0 20px;display:grid;gap:6px"><li>Revisa en <b>Ajustes › Qué vendo</b> que estén marcados tus productos.</li><li>Permite las notificaciones y quita el ahorro de batería (Ajustes › Autovigilancia).</li><li>Toca <b>Revisar ahora</b>. La primera vez tarda unos minutos.</li></ol>' +
       '<button class="btn big full" style="margin-top:12px" onclick="revisar()">Revisar ahora</button></div>';
     $("inicio-c").innerHTML = html; return;
   }
-  html += '<div class="grid kpis" style="margin-top:12px"><div class="card kpi" onclick="go(\'lic\')"><b style="color:var(--acc)">' + (d.nNuevas || 0) + '</b><span>Nuevas para ti</span></div><div class="card kpi" onclick="FILTRO=\'semana\';go(\'lic\')"><b style="color:var(--warn)">' + (d.semana || 0) + '</b><span>Cierran esta semana</span></div></div>';
-  html += '<div class="card row" style="margin-top:10px" onclick="go(\'cobros\')"><div><div class="small mute">Te debe el Estado</div><b style="font-size:20px">' + esc(d.debe) + '</b></div>' + (d.viejas ? '<span class="chip c-bad">' + d.viejas + ' con más de 60 días</span>' : '<span class="chip c-gray">Ver</span>') + '</div>';
-  html += '<h2>Nuevas para ti</h2>';
-  var n = d.nuevas || [];
-  html += n.length ? '<div class="grid">' + n.map(function(x){ return tarjeta(x, true); }).join("") + '</div>' : '<div class="empty">No hay licitaciones nuevas de lo que vendes.<br>Te aviso cuando salga algo.</div>';
+  html += '<div class="grid kpis3" style="margin-top:12px">' +
+    '<div class="card kpi" onclick="verLista(\'nuevas\')"><b style="color:var(--acc)">' + (d.nNuevas || 0) + '</b><span>Nuevas</span></div>' +
+    '<div class="card kpi" onclick="verLista(\'pronto\')"><b style="color:var(--warn)">' + (d.nPronto || 0) + '</b><span>Cierran pronto</span></div>' +
+    '<div class="card kpi" onclick="verLista(\'guardadas\')"><b>' + (d.guardadas || 0) + '</b><span>Guardadas</span></div></div>';
+  var n = d.nuevas || [], p = d.pronto || [];
+  html += '<div class="sec"><h2>Nuevas para ti</h2>' + (d.nNuevas > n.length ? '<a onclick="verLista(\'nuevas\')">Ver las ' + d.nNuevas + ' ›</a>' : '') + '</div>';
+  html += n.length ? '<div class="grid">' + n.map(function(x){ return tarjeta(x, true); }).join("") + '</div>' : '<div class="empty card">No hay licitaciones nuevas de lo que vendes.<br>Te aviso cuando salga algo.</div>';
+  html += '<div class="sec"><h2>Cierran pronto</h2>' + (d.nPronto > p.length ? '<a onclick="verLista(\'pronto\')">Ver todas ›</a>' : '') + '</div>';
+  html += p.length ? '<div class="rows">' + p.map(fila).join("") + '</div>' : '<div class="empty card">Nada cierra en los próximos 7 días.</div>';
+  html += '<div class="card row" style="margin-top:20px" onclick="go(\'cobros\')"><div><div class="small mute">Te debe el Estado</div><b style="font-size:20px">' + esc(d.debe) + '</b></div>' + (d.viejas ? '<span class="chip c-bad">' + d.viejas + ' con más de 60 días</span>' : '<span class="chip c-gray">Ver cobros ›</span>') + '</div>';
   $("inicio-c").innerHTML = html;
 }
 function revisar(){ var r = A.runNow(); toast(r === "ocupado" ? "Ya estoy revisando…" : "Revisando la DGCP…"); setTimeout(render, 400); }
 
 // ---------- licitaciones ----------
-function rLista(){
-  document.querySelectorAll("#flt button").forEach(function(b){ b.classList.toggle("on", b.dataset.f === FILTRO); b.onclick = function(){ FILTRO = b.dataset.f; rLista(); }; });
-  LIST = J(A.list()); if (!Array.isArray(LIST)) LIST = [];
+function rLista(reset){
+  if (!LIST) { LIST = J(A.list()); if (!Array.isArray(LIST)) LIST = []; LIST.forEach(function(x){ x._q = norm(x.tit + " " + x.inst + " " + x.corto + " " + x.code + " " + x.why); }); }
+  var cuenta = { nuevas: 0, pronto: 0, guardadas: 0, baja: 0 };
+  LIST.forEach(function(x){
+    var baja = x.prio === "baja";
+    if (x.saved) cuenta.guardadas++;
+    if (!x.abierta) return;
+    if (!baja && x.dias <= 7) cuenta.pronto++;
+    if (x.saved) return;
+    if (baja) { cuenta.baja++; return; }
+    if (x.nueva) cuenta.nuevas++;
+  });
+  document.querySelectorAll("#seg button").forEach(function(b){
+    var f = b.dataset.f; b.classList.toggle("on", f === FILTRO);
+    b.innerHTML = b.textContent.replace(/\d+$/, "").trim() + (cuenta[f] ? ' <b>' + cuenta[f] + '</b>' : '');
+    b.onclick = function(){ FILTRO = f; VISIBLES = 30; rLista(); window.scrollTo(0, 0); };
+  });
+  var q = norm($("q").value || ""), g = $("grp").value;
+  $("q").oninput = function(){ clearTimeout(qT); qT = setTimeout(function(){ VISIBLES = 30; rLista(); }, 180); };
+  $("grp").onchange = function(){ VISIBLES = 30; rLista(); };
   var l = LIST.filter(function(x){
-    if (FILTRO === "baja") return x.prio === "baja";
-    if (x.prio === "baja") return false;
-    if (FILTRO === "alta") return x.prio === "alta";
-    if (FILTRO === "semana") return x.dias <= 7;
-    if (["mil", "salud", "social"].indexOf(FILTRO) > -1) return x.grupo === FILTRO;
-    return true; });
-  $("list").innerHTML = l.length ? l.map(function(x){ return tarjeta(x, false); }).join("") : '<div class="empty">Nada con este filtro.</div>';
+    if (q && x._q.indexOf(q) < 0) return false;
+    if (g && x.grupo !== g) return false;
+    var baja = x.prio === "baja";
+    if (FILTRO === "guardadas") return x.saved;
+    if (!x.abierta) return false;
+    if (FILTRO === "baja") return baja && !x.saved;
+    if (baja) return false;
+    if (FILTRO === "nuevas") return x.nueva && !x.saved;
+    if (FILTRO === "pronto") return x.dias <= 7;
+    return true;
+  });
+  if (FILTRO === "pronto") l.sort(function(a, b){ return a.dias - b.dias; });
+  var vacio = { nuevas: "No hay nuevas de lo que vendes.", pronto: "Nada cierra en los próximos 7 días.", todas: "No hay licitaciones abiertas de lo que vendes.", guardadas: "No has guardado ninguna. Toca “Me interesa”.", baja: "Nada por revisar." }[FILTRO];
+  $("list").innerHTML = l.length ? l.slice(0, VISIBLES).map(function(x){ return tarjeta(x, false); }).join("") : '<div class="empty card">' + (q || g ? "Nada coincide con la búsqueda." : vacio) + '</div>';
+  $("mas").innerHTML = l.length > VISIBLES ? '<button class="btn alt full" style="margin-top:10px" onclick="VISIBLES+=30;rLista()">Ver más (' + (l.length - VISIBLES) + ')</button>' : '';
+  if (FILTRO === "baja" && l.length) $("list").insertAdjacentHTML("afterbegin", '<div class="note">Salieron solo por la categoría oficial de sus artículos, sin ninguna palabra de lo que vendes. Revísalas por si acaso.</div>');
 }
 
 // ---------- ofertas ----------
@@ -412,7 +477,7 @@ function loadS(){ if (!S) { S = J(A.settings()); CAT = J(A.catalog()); S.words =
 var guardarT;
 function guardar(){
   clearTimeout(guardarT);
-  guardarT = setTimeout(function(){ var r = A.saveSettings(JSON.stringify(S)); if (r !== "ok") { toast(r); S = null; } else toast("Guardado"); }, 350);
+  guardarT = setTimeout(function(){ var r = A.saveSettings(JSON.stringify(S)); sucio(); if (r !== "ok") { toast(r); S = null; } else toast("Guardado"); }, 350);
 }
 function wordsOf(it){ return S.words[it.id] || it.w; }
 function rAjustes(){

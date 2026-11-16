@@ -49,30 +49,21 @@ public final class Evaluador {
             if (a == null) continue;
             segmentos.add(new String[]{"artículos", a.optString(0)});
             String sub = a.optString(1, "");
-            boolean excluido = false;
-            String prep = Text.prep(a.optString(0));
-            for (String x : s.excluir) if (Text.has(prep, x)) { excluido = true; break; }
-            if (!excluido && !sub.isEmpty()) subclases.add(sub.replaceAll("[^0-9]", ""));
+            if (!sub.isEmpty() && !s.excluido(Text.prep(a.optString(0)))) subclases.add(sub.replaceAll("[^0-9]", ""));
         }
 
         Set<String> donde = new LinkedHashSet<>();
         boolean huboExcluidos = false;
         for (String[] seg : segmentos) {
             String prep = Text.prep(seg[1]);
-            if (prep.trim().isEmpty()) continue;
-            boolean excl = false;
-            for (String x : s.excluir) if (Text.has(prep, x)) { excl = true; break; }
-            if (excl) { huboExcluidos = true; continue; }
-            for (Settings.Cat c : s.activas) {
-                for (String w : c.palabras) {
-                    if (Text.has(prep, w)) { r.palabras.add(w); r.categorias.add(c.nombre); donde.add(seg[0]); }
-                }
-            }
-            for (String w : s.mias) {
-                if (Text.has(prep, w)) { r.palabras.add(w); r.categorias.add("Mis nombres"); donde.add(seg[0]); }
-            }
-            for (Settings.Cat c : s.inactivas) {
-                for (String w : c.palabras) if (Text.has(prep, w)) { r.sugerir.add(c.nombre); break; }
+            String[] toks = Settings.tokens(prep);
+            if (toks.length == 0) continue;
+            if (s.excluido(prep)) { huboExcluidos = true; continue; }
+            for (Settings.W w : s.inactivasEn(prep, toks)) r.sugerir.add(w.cat.nombre);
+            for (Settings.W w : s.activasEn(prep, toks)) {
+                r.palabras.add(w.palabra);
+                r.categorias.add(w.cat != null ? w.cat.nombre : "Mis nombres");
+                donde.add(seg[0]);
             }
         }
 

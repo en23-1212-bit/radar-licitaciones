@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.widget.LinearLayout;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -26,13 +29,42 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(0xFF14213D);
         Notifier.canales(this);
         Programador.asegurar(this);
 
+        // Pantalla de borde a borde con márgenes propios: así la barra de abajo nunca queda
+        // debajo de los botones de Android/Samsung ni la de arriba debajo de la hora.
+        LinearLayout raiz = new LinearLayout(this);
+        raiz.setOrientation(LinearLayout.VERTICAL);
+        raiz.setBackgroundColor(0xFFFFFFFF);
+        final View arriba = new View(this);
+        arriba.setBackgroundColor(0xFF14213D);
+        final View abajo = new View(this);
+        abajo.setBackgroundColor(0xFFFFFFFF);
         web = new WebView(this);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        setContentView(web);
+        web.setBackgroundColor(0xFFF2F3F6);
+        raiz.addView(arriba, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
+        raiz.addView(web, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+        raiz.addView(abajo, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
+        setContentView(raiz);
+        bordeABorde();
+        raiz.setOnApplyWindowInsetsListener((v, insets) -> {
+            int top, bottom, left, right;
+            if (Build.VERSION.SDK_INT >= 30) {
+                android.graphics.Insets b = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                android.graphics.Insets ime = insets.getInsets(WindowInsets.Type.ime());
+                top = b.top; bottom = Math.max(b.bottom, ime.bottom); left = b.left; right = b.right;
+            } else {
+                top = legacyTop(insets); bottom = legacyBottom(insets); left = legacyLeft(insets); right = legacyRight(insets);
+            }
+            arriba.getLayoutParams().height = top;
+            abajo.getLayoutParams().height = bottom;
+            arriba.requestLayout();
+            abajo.requestLayout();
+            v.setPadding(left, 0, right, 0);
+            return insets;
+        });
         WebSettings ws = web.getSettings();
         ws.setJavaScriptEnabled(true);
         ws.setDomStorageEnabled(true);
@@ -114,6 +146,34 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> js("toast(" + JSONObject.quote(m) + "); window.onResume && onResume()"));
         }, "radar-importar").start();
     }
+
+    private void bordeABorde() {
+        android.view.Window w = getWindow();
+        w.setStatusBarColor(0x00000000);
+        w.setNavigationBarColor(0x00000000);
+        if (Build.VERSION.SDK_INT >= 29) w.setNavigationBarContrastEnforced(false);
+        if (Build.VERSION.SDK_INT >= 30) {
+            w.setDecorFitsSystemWindows(false);
+            WindowInsetsController c = w.getInsetsController();
+            if (c != null) c.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS | WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+        } else {
+            legacyFlags(w);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void legacyFlags(android.view.Window w) {
+        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+    }
+
+    @SuppressWarnings("deprecation") private static int legacyTop(WindowInsets i) { return i.getSystemWindowInsetTop(); }
+    @SuppressWarnings("deprecation") private static int legacyBottom(WindowInsets i) { return i.getSystemWindowInsetBottom(); }
+    @SuppressWarnings("deprecation") private static int legacyLeft(WindowInsets i) { return i.getSystemWindowInsetLeft(); }
+    @SuppressWarnings("deprecation") private static int legacyRight(WindowInsets i) { return i.getSystemWindowInsetRight(); }
 
     void js(String code) {
         if (web != null) web.evaluateJavascript(code, null);
